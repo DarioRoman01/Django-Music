@@ -33,8 +33,8 @@ Creation of a backend infrastructure based on cloud computing and the creation o
 ## Architecture
 
 ### Architecture Diagrams
-
-poner diagramas de secuencia, uml, etc
+This a high level design and is agnostic
+![](./images/system.png)
 
 ### Data Base design
 
