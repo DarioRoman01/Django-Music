@@ -7,7 +7,7 @@ from django.db import models
 from apps.users.models import User
 from apps.utils import DjangoMusic
 
-class Artist(DjangoMusic, models.Model):
+class Artist(DjangoMusic):
     """Artist model. acts like a profile for aritsts users."""
 
     artist_name = models.CharField(max_length=60)

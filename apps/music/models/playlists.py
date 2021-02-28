@@ -8,7 +8,7 @@ from apps.utils import DjangoMusic
 from apps.music.models import Song
 from apps.users.models import User
 
-class Playlist(DjangoMusic, models.Model):
+class Playlist(DjangoMusic):
     """Playlist model."""
 
     title = models.CharField(max_length=50)
