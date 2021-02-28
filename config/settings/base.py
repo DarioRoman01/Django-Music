@@ -11,7 +11,7 @@ env = environ.Env()
 environ.Env.read_env()
 
 # Users & authentication
-# AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.User'
 
 # apps dir
 ROOT_DIR = environ.Path(__file__) - 3
@@ -40,7 +40,8 @@ DJANGO_APPS = [
 ]
 
 LOCAL_APPS = [
-
+    'apps.users',
+    'apps.music',
 ]
 
 THIRD_PARTY_APPS = [
