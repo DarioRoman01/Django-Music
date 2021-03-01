@@ -45,17 +45,21 @@ class AddToPlaylistSerializer(serializers.Serializer):
     def validate(self, data):
         """Validate if the song name introduced exists."""
         song_name = data['song_name']
-        song = Song.objects.get(title=song_name)
-
-        if not song:
+        
+        
+        if Song.objects.filter(title=song_name).exists():
+            song =Song.objects.get(title=song_name) 
+            self.context['song'] = song
+            return data
+        else:
             raise serializers.ValidationError('Song not found')
-
-        return song
+           
+        
 
     def create(self, validated_data):
         """Handle adding the song to an album."""
         
-        song = validated_data['song']
+        song = self.context['song']
         playlist = self.context['playlist']
 
         playlist.songs.add(song)

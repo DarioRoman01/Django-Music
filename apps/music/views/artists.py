@@ -18,7 +18,13 @@ from apps.music.serializers import (
 )
 
 # Models 
-from apps.music.models import Artist
+from apps.music.models import Artist, Album
+
+# Serializers
+from apps.music.serializers import (
+    ArtistModelSerializer,
+    AlbumModelSerializer
+)
 
 class ArtistViewSet(mixins.ListModelMixin,
                     mixins.RetrieveModelMixin,
@@ -27,6 +33,10 @@ class ArtistViewSet(mixins.ListModelMixin,
     """Artist view set."""
 
     serializer_class = ArtistModelSerializer
+
+    def dispatch(self, request, *args, **kwargs):
+        self.artist = get_object_or_404(Artist, pk=self.kwargs['pk'])
+        return super(ArtistViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_permissions(self):
         """Assing permissions based on actions."""
@@ -41,10 +51,7 @@ class ArtistViewSet(mixins.ListModelMixin,
         return [p() for p in permissions]
 
     def get_object(self):
-        return get_object_or_404(
-            Artist,
-            pk=self.kwargs['pk']
-        )
+        return get_object_or_404(Artist, pk=self.kwargs['pk'])
 
     def get_queryset(self):
         query = Artist.objects.all()

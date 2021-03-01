@@ -13,7 +13,8 @@ from apps.music.permissions import IsSongOwner, IsArtist
 # Serializers
 from apps.music.serializers import (
     CreateSongSerializer,
-    SongModelSeriaizer
+    SongModelSeriaizer,
+    ArtistModelSerializer
 )
 
 # Models
@@ -25,6 +26,12 @@ class SongViewSet(mixins.RetrieveModelMixin,
     
     serializer_class = SongModelSeriaizer
 
+    def dispatch(self, request, *args, **kwargs):
+        """Verify that album exists."""
+        pk = self.kwargs['pk']
+        self.song = get_object_or_404(Song, pk=pk)
+        return super(SongViewSet, self).dispatch(request, *args, **kwargs)
+
     def get_permissions(self):
         """Assing permissions based on actions."""
         if self.action == 'retrieve':
@@ -34,10 +41,7 @@ class SongViewSet(mixins.RetrieveModelMixin,
         return [p() for p in permissions]
 
     def get_object(self):
-        return get_object_or_404(
-            Song,
-            pk=self.kwargs['pk']
-        )
+        return get_object_or_404(Song, pk=self.kwargs['pk'])
 
     def get_queryset(self):
         """Assing querys based on actions."""
@@ -62,4 +66,5 @@ class SongViewSet(mixins.RetrieveModelMixin,
         data = SongModelSeriaizer(song).data
 
         return Response(data, status=status.HTTP_201_CREATED)
+
     

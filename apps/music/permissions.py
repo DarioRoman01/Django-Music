@@ -24,51 +24,41 @@ class IsArtistOwner(BasePermission):
     """Allow access only to users who are artist.
     and are owners of the artist profile"""
 
-    def has_object_permission(self, request, view, obj):
-        aritst = obj
-        if aritst.user == request.user:
-            return True
-        else:
-            return False    
+    def has_permission(self, request, view):
+        return view.artist.user == request.user 
+   
     
 
 class IsAlbumOwner(BasePermission):
     """Allow access to the artist that own the album."""
 
-    def has_object_permission(self, request, view, obj):
-        """Check if the artist own the album."""
-        album = obj
-
-        if album.artist == request.user.artist:
-            return True
-        else:
+    def has_permission(self, request, view):
+        album = view.album
+        artist = Artist.objects.get(user=request.user)
+        if not artist:
             return False
+        else:
+            return album.artist == artist
+    
 
 class IsSongOwner(BasePermission):
     """Allow access to the artist that own the song."""
 
-    def has_object_permission(self, request, view, obj):
-        """Check if the artist own the song."""
-        song = obj
-
-        if song.artist == request.user.artist:
-            return True
-
-        else:
+    def has_permission(self, request, view):
+        song = view.song
+        artist = Artist.objects.get(user=request.user)
+        if not artist:
             return False
-            
+        else:
+            return song.artist == artist
     
 
 class IsPlaylistOwner(BasePermission):
     """Allow access only to the owner to the playlist."""
 
-    def has_object_permission(self, request, view, obj):
-        playlist = obj
-        if playlist.user == request.user:
-            return True
-        else:
-            return False
-
+    def has_permission(self, request, view):
+        playlist = view.playlist
+        return request.user == playlist.user
 
 
    

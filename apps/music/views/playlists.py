@@ -26,25 +26,26 @@ class PlaylistViewSet(mixins.RetrieveModelMixin,
 
     serializer_class = PlaylistModelSerializer
 
+    def dispatch(self, request, *args, **kwargs):
+        """Verify that playlist exists."""
+        self.playlist = get_object_or_404(Playlist, pk=self.kwargs['pk'])
+        return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
+
     def get_permissions(self):
         """Assing permissions based on actions."""
+        permissions = [IsAuthenticated]
 
-        if self.action == 'createPlaylist':
-            permissions = [IsAuthenticated]
-        elif self.action == 'addSong':
-            permissions = [IsAuthenticated, IsPlaylistOwner]
+        if self.action == 'addSong':
+            permissions.append(IsPlaylistOwner)
 
         return [p() for p in permissions]
 
     def get_object(self):
-        return get_object_or_404(
-            Playlist,
-            pk=self.kwargs['pk']
-        )
+        """Get specific playlist."""
+        return get_object_or_404(Playlist, pk=self.kwargs['pk'])
 
     def get_queryset(self):
         """Assing querys based on actions."""
-        
         query = Playlist.objects.all()
         if self.action in ['retrieve', 'addSong']:
             return query.get(pk=self.kwargs['pk'])

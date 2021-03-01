@@ -51,20 +51,22 @@ class AddSongSerializer(serializers.Serializer):
     song_name = serializers.CharField()
 
     def validate(self, data):
-        """Validate if the song name introduced exists."""
-
+        """Validate if the song introduced exists."""
         song_name = data['song_name']
-        song = Song.objects.get(song_name)
 
-        if not song:
+        if Song.objects.filter(title=song_name).exists():
+            song = Song.objects.get(title=song_name)
+            self.context['song'] = song
+            return data
+        else:
             raise serializers.ValidationError('Song not found:( ')
 
-        return song
+      
 
     def create(self, data):
         """Handle adding the song to an album."""
         album = self.context['album']
-        song = data['song']
+        song = self.context['song']
         album.songs.add(song)
 
         return album

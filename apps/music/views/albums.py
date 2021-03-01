@@ -14,7 +14,9 @@ from apps.music.permissions import IsAlbumOwner, IsArtist
 from apps.music.serializers import (
     CreateAlbumSerializer,
     AlbumModelSerializer,
-    AddSongSerializer
+    AddSongSerializer,
+    SongModelSeriaizer,
+    ArtistModelSerializer
 )
 
 # Models
@@ -26,6 +28,12 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
 
     serializer_class = AlbumModelSerializer
 
+    def dispatch(self, request, *args, **kwargs):
+        """Verify that album exists."""
+        pk = self.kwargs['pk']
+        self.album = get_object_or_404(Album, pk=pk)
+        return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)
+
     def get_permissions(self):
         """Assing permissions based on actions."""
         if self.action == 'retrieve':
@@ -33,24 +41,20 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
         elif self.action == 'createAlbum':
             permissions = [IsAuthenticated, IsArtist]
         elif self.action == 'addSong':
-            permissions = [IsAuthenticated, IsAlbumOwner]
+            permissions = [IsAuthenticated, IsAlbumOwner, IsArtist]
 
         return [p() for p in permissions]
 
     def get_object(self):
         """Return specific album."""
-
-        return get_object_or_404(
-            Album,
-            pk=self.kwargs['pk']
-        )
+        return get_object_or_404(Album, pk=self.kwargs['pk'])
 
     def get_queryset(self):
         """Assing querys based on actions."""
 
         query = Album.objects.all()
 
-        if self.action == 'retrieve':
+        if self.action in ['retrieve', 'addSong']:
             return query.get(pk=self.kwargs['pk'])
 
         return query
@@ -71,11 +75,11 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
         return Response(data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['POST'])
-    def addSong(self, request):
+    def addSong(self, request, pk):
         """Handle adding songs to the album instance."""
-
+        album_context = self.album
         serializer = AddSongSerializer(
-            context={'album': self.get_object()},
+            context={'album': album_context},
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
@@ -83,5 +87,4 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
         data = AlbumModelSerializer(album).data
 
         return Response(data, status=status.HTTP_200_OK)
-
         
