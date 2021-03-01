@@ -14,6 +14,7 @@ class SongTestCase(TestCase):
     """Song test case."""
 
     def setUp(self):
+        """Test case set up."""
         self.user = User.objects.create_user(username='test12', email='p@mlh.io', password='test123')
         self.user.save()
         self.artist = Artist.objects.create(artist_name='freddie testcase', user=self.user)
@@ -27,10 +28,12 @@ class SongTestCase(TestCase):
         self.song.save()
 
     def tearDown(self):
+        """Test case tear down."""
         self.user.delete()
         self.artist.delete()
         self.song.delete()
 
     def test_artist(self):
+        """Test foreing key relationship with artist model."""
         self.assertIsNotNone(self.song and self.artist and self.user)
         self.assertEqual(self.song.artist, self.artist)

@@ -38,6 +38,8 @@ class CreateAlbumSerializer(serializers.Serializer):
     release_date = serializers.DateTimeField()
 
     def create(self, data):
+        """Handle album creation."""
+        
         artist = self.context['artist']
         album = Album.objects.create(artist=artist, **data)
         return album
@@ -49,6 +51,8 @@ class AddSongSerializer(serializers.Serializer):
     song_name = serializers.CharField()
 
     def validate(self, data):
+        """Validate if the song name introduced exists."""
+
         song_name = data['song_name']
         song = Song.objects.get(song_name)
 
@@ -58,8 +62,9 @@ class AddSongSerializer(serializers.Serializer):
         return song
 
     def create(self, data):
-       album = self.context['album']
-       song = data['song_name']
-       album.songs.add(song)
+        """Handle adding the song to an album."""
+        album = self.context['album']
+        song = data['song']
+        album.songs.add(song)
 
-       return album
+        return album

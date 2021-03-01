@@ -16,10 +16,14 @@ class ArtistModelSerializer(serializers.ModelSerializer):
 
 
 class CreateArtistSerializer(serializers.Serializer):
+    """Create artist serializer."""
+
     artist_name =  serializers.CharField(max_length=60)
     picture = serializers.ImageField(required=False)
 
     def create(self, data):
+        """Handle artist profile creation."""
+        
         user = self.context['user']
         artist = Artist.objects.create(user=user, **data)
         return artist

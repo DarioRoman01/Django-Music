@@ -19,9 +19,6 @@ class Album(DjangoMusic):
     def __str__(self):
         return self.title
 
-    def get_artist(self):
-        return self.artist.artist_name
-
     def set_cover_images(self):
         """
         Set his cover image to all the songs related

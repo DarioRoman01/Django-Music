@@ -27,12 +27,14 @@ class CreatePlaylistSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=50)
 
     def create(self, data):
+        """Handle playlist creation."""
+
         user = self.context['user']
         playlist = Playlist.objects.create(user=user, **data)
 
         return playlist
 
-class AddSongSerializer(serializers.Serializer):
+class AddToPlaylistSerializer(serializers.Serializer):
     """
     Add song serializer, handle adding
     songs to a playlist
@@ -41,6 +43,7 @@ class AddSongSerializer(serializers.Serializer):
     song_name = serializers.CharField(max_length=60)
 
     def validate(self, data):
+        """Validate if the song name introduced exists."""
         song_name = data['song_name']
         song = Song.objects.get(title=song_name)
 
@@ -50,6 +53,8 @@ class AddSongSerializer(serializers.Serializer):
         return song
 
     def create(self, validated_data):
+        """Handle adding the song to an album."""
+        
         song = validated_data['song']
         playlist = self.context['playlist']
 

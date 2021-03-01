@@ -15,6 +15,7 @@ class AlbumTestCase(TestCase):
     """Album Test case."""
 
     def setUp(self):
+        """Test case set up."""
         self.user = User.objects.create_user(username='test12', email='p@mlh.io', password='test123')
         self.user.save()
         self.artist = Artist.objects.create(artist_name='freddie testcase', user=self.user)
@@ -36,10 +37,12 @@ class AlbumTestCase(TestCase):
 
 
     def test_artist(self):
+        """Test artist foreing key relationship."""
         self.assertIsNotNone(self.album and self.artist)
         self.assertEqual(self.album.artist, self.artist)
 
     def test_add_song(self):
+        """Test relationship adding songs to the album"""
         album = self.album
         album.songs.add(self.song)
         album_songs = list(album.songs.all())

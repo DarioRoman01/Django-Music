@@ -15,6 +15,7 @@ class PlaylistTestCase(TestCase):
     """Playlist test case."""
 
     def setUp(self):
+        """Test case set up."""
         self.user = User.objects.create_user(
             username='test12', 
             email='p@mlh.io', 
@@ -42,10 +43,12 @@ class PlaylistTestCase(TestCase):
         self.playlist.save()
 
     def test_user(self):
+        """Test user forieng key relationship."""
         self.assertIsNotNone(self.user and self.song and self.playlist)
         self.assertEqual(self.playlist.user, self.user)
 
     def test_songs(self):
+        """Test relationship with songs adding to the playlist."""
         playlist = self.playlist
         playlist.songs.add(self.song)
         playlist_songs = list(playlist.songs.all())
