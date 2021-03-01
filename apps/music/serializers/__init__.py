@@ -1,4 +1,4 @@
-from .artists import ArtistModelSerializer, CreateArtistSerializer
+from .artists import ArtistModelSerializer, CreateArtistSerializer, ArtistVerificationSerializer
 from .songs import SongModelSeriaizer, CreateSongSerializer
 from .albums import AlbumModelSerializer, CreateAlbumSerializer, AddSongSerializer
 from .playlists import PlaylistModelSerializer, CreatePlaylistSerializer, AddToPlaylistSerializer
