@@ -18,7 +18,7 @@ from apps.music.serializers import (
 )
 
 # Models
-from apps.music.models import Album
+from apps.music.models import Album, Artist
 
 class AlbumViewSet(mixins.RetrieveModelMixin,
                    viewsets.GenericViewSet):
@@ -34,7 +34,6 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
             permissions = [IsAuthenticated, IsArtist]
         elif self.action == 'addSong':
             permissions = [IsAuthenticated, IsAlbumOwner]
-
 
         return [p() for p in permissions]
 
@@ -59,9 +58,9 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
     @action(detail=False, methods=['POST'])
     def createAlbum(self, request):
         """Handle album creation."""
-
+        artist = Artist.objects.get(user=request.user)
         serializer = CreateAlbumSerializer(
-            context={'artist': request.user.aritst},
+            context={'artist': artist},
             data=request.data
         )
         serializer.is_valid(raise_exception=True)

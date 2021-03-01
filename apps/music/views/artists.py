@@ -40,6 +40,12 @@ class ArtistViewSet(mixins.ListModelMixin,
 
         return [p() for p in permissions]
 
+    def get_object(self):
+        return get_object_or_404(
+            Artist,
+            pk=self.kwargs['pk']
+        )
+
     def get_queryset(self):
         query = Artist.objects.all()
 
@@ -60,7 +66,7 @@ class ArtistViewSet(mixins.ListModelMixin,
 
     @action(detail=False, methods=['POST'])
     def verifyArtist(self, request):
-        serializer = ArtistVerificationSerializer()
+        serializer = ArtistVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         artist = serializer.save()
         data = {

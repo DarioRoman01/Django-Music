@@ -18,13 +18,3 @@ class Album(DjangoMusic):
 
     def __str__(self):
         return self.title
-
-    def set_cover_images(self):
-        """
-        Set his cover image to all the songs related
-        with the album
-        """
-        image = self.cover_image
-        songs_list = list(self.songs.all())
-        for song in songs_list:
-            song.cover_image = image

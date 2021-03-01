@@ -33,6 +33,20 @@ class SongViewSet(mixins.RetrieveModelMixin,
             permissions = [IsAuthenticated, IsArtist]
         return [p() for p in permissions]
 
+    def get_object(self):
+        return get_object_or_404(
+            Song,
+            pk=self.kwargs['pk']
+        )
+
+    def get_queryset(self):
+        """Assing querys based on actions."""
+        query = Song.objects.all()
+        if self.action == 'retrieve':
+            return query.get(pk=self.kwargs['pk'])
+
+        return query
+
     
     @action(detail=False, methods=['POST'])
     def createSong(self, request):
