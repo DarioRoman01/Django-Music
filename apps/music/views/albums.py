@@ -30,6 +30,10 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
         """Assing permissions based on actions."""
         if self.action == 'retrieve':
             permissions = [IsAuthenticated]
+        elif self.action == 'createAlbum':
+            permissions = [IsAuthenticated, IsArtist]
+        elif self.action == 'addSong':
+            permissions = [IsAuthenticated, IsAlbumOwner]
 
 
         return [p() for p in permissions]
@@ -45,12 +49,12 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
     def get_queryset(self):
         """Assing querys based on actions."""
 
-        qeury = Album.objects.all()
+        query = Album.objects.all()
 
         if self.action == 'retrieve':
-            return qeury.get(pk=self.kwargs['pk'])
+            return query.get(pk=self.kwargs['pk'])
 
-        return qeury
+        return query
 
     @action(detail=False, methods=['POST'])
     def createAlbum(self, request):

@@ -7,7 +7,8 @@ from rest_framework.permissions import BasePermission
 from apps.music.models import (
     Artist,
     Album,
-    Song
+    Song,
+    Playlist
 )
 
 class IsArtist(BasePermission):
@@ -24,42 +25,49 @@ class IsArtistOwner(BasePermission):
     and are owners of the artist profile"""
 
     def has_object_permission(self, request, view, obj):
-        
-        try:
-            Artist.objects.get(user=request.user)
-
-        except Artist.DoesNotExist:
-            return False
-
-        return True
+        aritst = obj
+        if aritst.user == request.user:
+            return True
+        else:
+            return False    
+    
 
 class IsAlbumOwner(BasePermission):
     """Allow access to the artist that own the album."""
 
     def has_object_permission(self, request, view, obj):
         """Check if the artist own the album."""
+        album = obj
 
-        try:
-            Album.objects.get(artist=request.user.artist)
-
-        except Album.DoesNotExist:
+        if album.artist == request.user.artist:
+            return True
+        else:
             return False
-
-        return True
 
 class IsSongOwner(BasePermission):
     """Allow access to the artist that own the song."""
 
     def has_object_permission(self, request, view, obj):
         """Check if the artist own the song."""
-        
-        try:
-            Song.objects.get(artist=request.user.artist)
+        song = obj
 
-        except Song.DoesNotExist:
+        if song.artist == request.user.artist:
+            return True
+
+        else:
             return False
+            
+    
 
-        return True
+class IsPlaylistOwner(BasePermission):
+    """Allow access only to the owner to the playlist."""
+
+    def has_object_permission(self, request, view, obj):
+        playlist = obj
+        if playlist.user == request.user:
+            return True
+        else:
+            return False
 
 
 
