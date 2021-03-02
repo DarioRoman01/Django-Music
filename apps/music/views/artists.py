@@ -41,23 +41,22 @@ class ArtistViewSet(mixins.ListModelMixin,
 
     def get_permissions(self):
         """Assing permissions based on actions."""
+        permissions = [IsAuthenticated]
 
-        if self.action in ['list', 'retrieve']:
-            permissions = [IsAuthenticated]
-        elif self.action in ['update', 'partial_update']:
-            permissions = [IsAuthenticated, IsArtistOwner]
-        else:
-            permissions = [IsAuthenticated]
+        if self.action in ['update', 'partial_update']:
+            permissions.append(IsArtistOwner)
 
         return [p() for p in permissions]
 
     def get_object(self):
+        """return aritst instance."""
         return get_object_or_404(Artist, pk=self.kwargs['pk'])
 
     def get_queryset(self):
+        """Assing querys based on actions."""
         query = Artist.objects.all()
 
-        if self.action == ['update', 'partial_update', 'retrieve']:
+        if self.action == ['update', 'partial_update', 'retrieve', 'follow']:
             return query.get(pk=self.kwargs['pk'])
 
         return query
@@ -74,6 +73,7 @@ class ArtistViewSet(mixins.ListModelMixin,
 
     @action(detail=False, methods=['POST'])
     def verifyArtist(self, request):
+        """Handle artist verification."""
         serializer = ArtistVerificationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         artist = serializer.save()
@@ -83,3 +83,22 @@ class ArtistViewSet(mixins.ListModelMixin,
         }
 
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
+    def follow(self, request, pk):
+        """Follow endpoint, handle how users follows an artist."""
+        artist = self.artist
+
+        if artist.follow.filter(id=request.user.id).exists():
+            artist.follow.remove(request.user)
+            artist.followers -= 1
+            artist.save()
+
+        else:
+            artist.follow.add(request.user)
+            artist.followers += 1
+            artist.save()
+
+        data = ArtistModelSerializer(artist).data
+
+        return Response(data, status=status.HTTP_200_OK) 

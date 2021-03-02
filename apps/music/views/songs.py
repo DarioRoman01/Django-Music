@@ -34,10 +34,11 @@ class SongViewSet(mixins.RetrieveModelMixin,
 
     def get_permissions(self):
         """Assing permissions based on actions."""
-        if self.action == 'retrieve':
-            permissions = [IsAuthenticated]
-        elif self.action == 'createSong':
-            permissions = [IsAuthenticated, IsArtist]
+        permissions = [IsAuthenticated]
+
+        if self.action == 'createSong':
+            permissions.append(IsArtist)
+
         return [p() for p in permissions]
 
     def get_object(self):
@@ -67,4 +68,23 @@ class SongViewSet(mixins.RetrieveModelMixin,
 
         return Response(data, status=status.HTTP_201_CREATED)
 
-    
+    @action(detail=True, methods=['POST'])
+    def toggleLike(self, request, pk):
+        """toggle like endpoint handle likes to the album."""
+        song = self.song
+
+        # Check if the user already liked the song to perform unlike action
+        if song.like.filter(id=request.user.id).exists():
+            song.like.remove(request.user)
+            song.likes -= 1
+            song.save()
+            
+        # Else perform like action
+        else:
+            song.like.add(request.user)
+            song.likes += 1
+            song.save()
+
+        data = SongModelSeriaizer(song).data
+
+        return Response(data, status=status.HTTP_200_OK) 

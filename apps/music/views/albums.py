@@ -87,4 +87,25 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
         data = AlbumModelSerializer(album).data
 
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['POST'])
+    def toggleLike(self, request, pk):
+        """toggle like endpoint handle likes to the album."""
+        album = self.album
+
+        # Check if the user already like the album to perform unlike action
+        if album.like.filter(id=request.user.id).exists():
+            album.like.remove(request.user)
+            album.likes -= 1
+            album.save()
         
+        # else perform like action
+        else:
+            album.like.add(request.user)
+            album.likes += 1
+            album.save()
+
+        data = AlbumModelSerializer(album).data
+
+        return Response(data, status=status.HTTP_200_OK)
+            

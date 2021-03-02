@@ -19,7 +19,7 @@ class PlaylistModelSerializer(serializers.ModelSerializer):
 
         model = Playlist
         fields = ('title', 'songs', 'followers')
-        read_only_fields = ('followers')
+        read_only_fields = ('followers',)
 
 
 class CreatePlaylistSerializer(serializers.Serializer):

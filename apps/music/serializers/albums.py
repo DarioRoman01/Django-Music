@@ -30,7 +30,7 @@ class AlbumModelSerializer(serializers.ModelSerializer):
             'artist',
             'songs'
         )
-        read_only_fields = ('likes')
+        read_only_fields = ('likes',)
 
 class CreateAlbumSerializer(serializers.Serializer):
     """Create Album serializer."""

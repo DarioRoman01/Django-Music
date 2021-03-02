@@ -3,6 +3,7 @@ With these settings, tests run faster.
 """
 
 from .base import *
+from .base import env
 
 # Base
 DEBUG = False

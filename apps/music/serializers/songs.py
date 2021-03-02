@@ -22,9 +22,10 @@ class SongModelSeriaizer(serializers.ModelSerializer):
             'cover_image',
             'song_file',
             'release_date',
-            'like',
+            'likes',
             'artist'
         )
+        read_only_fields = ('likes',)
 
 class CreateSongSerializer(serializers.Serializer):
     """Create song serializer."""

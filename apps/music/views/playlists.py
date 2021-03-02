@@ -68,13 +68,34 @@ class PlaylistViewSet(mixins.RetrieveModelMixin,
     @action(detail=True, methods=['POST'])
     def addSong(self, request, pk):
         """handle adding song to a playlist."""
-
         serializer = AddToPlaylistSerializer(
             context={'playlist': self.get_object()},
             data=request.data
         )
         serializer.is_valid(raise_exception=True)
         playlist = serializer.save()
+        data = PlaylistModelSerializer(playlist).data
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+    @action(detail=True, methods=['POST'])
+    def follow(self, request, pk):
+        """Follow endpoint, handle how users follows the playlist."""
+        playlist = self.playlist
+
+        # Check if requesting user already follow the playlist
+        if playlist.follow.filter(id=request.user.id).exists():
+            playlist.follow.remove(request.user)
+            playlist.followers -= 1
+            playlist.save()
+        
+        # if user dont follow the playlist is added to the playlist followers.
+        else:
+            playlist.follow.add(request.user)
+            playlist.followers += 1
+            playlist.save()
+
         data = PlaylistModelSerializer(playlist).data
 
         return Response(data, status=status.HTTP_200_OK)
