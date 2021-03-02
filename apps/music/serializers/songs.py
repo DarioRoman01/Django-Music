@@ -22,6 +22,7 @@ class SongModelSeriaizer(serializers.ModelSerializer):
             'cover_image',
             'song_file',
             'release_date',
+            'like',
             'artist'
         )
 
@@ -34,6 +35,7 @@ class CreateSongSerializer(serializers.Serializer):
     release_date = serializers.DateTimeField()
 
     def create(self, data):
+        """Hadnle song creation."""
         artist = self.context['artist']
         song = Song.objects.create(artist=artist, **data)
         return song

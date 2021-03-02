@@ -26,9 +26,11 @@ class AlbumModelSerializer(serializers.ModelSerializer):
             'title',
             'cover_image',
             'release_date',
+            'likes',
             'artist',
             'songs'
         )
+        read_only_fields = ('likes')
 
 class CreateAlbumSerializer(serializers.Serializer):
     """Create Album serializer."""

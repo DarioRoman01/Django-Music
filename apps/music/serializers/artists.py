@@ -25,7 +25,8 @@ class ArtistModelSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class."""
         model = Artist
-        fields = ('artist_name', 'picture')
+        fields = ('artist_name', 'picture', 'followers')
+        read_only_fields = ('followers')
 
 
 class CreateArtistSerializer(serializers.Serializer):

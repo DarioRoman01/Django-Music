@@ -35,6 +35,7 @@ class ArtistViewSet(mixins.ListModelMixin,
     serializer_class = ArtistModelSerializer
 
     def dispatch(self, request, *args, **kwargs):
+        """Verify that artist exists."""
         self.artist = get_object_or_404(Artist, pk=self.kwargs['pk'])
         return super(ArtistViewSet, self).dispatch(request, *args, **kwargs)
 

@@ -18,7 +18,8 @@ class PlaylistModelSerializer(serializers.ModelSerializer):
         """Meta class."""
 
         model = Playlist
-        fields = ('title', 'songs')
+        fields = ('title', 'songs', 'followers')
+        read_only_fields = ('followers')
 
 
 class CreatePlaylistSerializer(serializers.Serializer):
