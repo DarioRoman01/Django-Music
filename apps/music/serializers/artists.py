@@ -25,14 +25,14 @@ class ArtistModelSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class."""
         model = Artist
-        fields = ('artist_name', 'picture', 'followers')
+        fields = ('name', 'picture', 'followers')
         read_only_fields = ('followers',)
 
 
 class CreateArtistSerializer(serializers.Serializer):
     """Create artist serializer."""
 
-    artist_name =  serializers.CharField(max_length=60)
+    name =  serializers.CharField(max_length=60)
     picture = serializers.ImageField(required=False)
 
     def create(self, data):

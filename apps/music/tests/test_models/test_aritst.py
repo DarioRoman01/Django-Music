@@ -14,7 +14,7 @@ class ArtistTestCase(TestCase):
         """Test case set up."""
         self.user = User.objects.create_user(username='test12', email='p@mlh.io', password='test123')
         self.user.save()
-        self.artist = Artist.objects.create(artist_name='freddie testcase', user=self.user)
+        self.artist = Artist.objects.create(name='freddie testcase', user=self.user)
         self.artist.save()
 
     def tearDown(self):

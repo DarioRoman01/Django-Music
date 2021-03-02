@@ -24,7 +24,7 @@ class PlaylistTestCase(TestCase):
         self.user.save()
 
         self.artist = Artist.objects.create(
-            artist_name='freddie testcase', 
+            name='freddie testcase', 
             user=self.user
         )
         self.artist.save()

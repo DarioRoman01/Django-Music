@@ -25,18 +25,18 @@ class POSTRequestsAPITestCase(APITestCase):
         self.artist_token = Token.objects.create(user=self.user_artist).key
         self.user_artist.save()
 
-        self.artist = Artist.objects.create(artist_name='freddie testcase', user=self.user_artist)
+        self.artist = Artist.objects.create(name='freddietestcase', user=self.user_artist)
         self.artist.save()
 
         self.album = Album.objects.create(
-            title='awesome album',
+            title='awesomealbum',
             artist=self.artist,
             release_date='2007-10-25 14:30:59',
         )
         self.album.save()
 
         self.song = Song.objects.create(
-            title='Awesome song',
+            title='Awesomesong',
             release_date='2006-10-25 14:30:59',
             artist=self.artist
         )
@@ -45,10 +45,11 @@ class POSTRequestsAPITestCase(APITestCase):
         self.user_client = User.objects.create_user(username='12test', email='j@mlh.io', password='test123', is_artist=False)
         self.user_token = Token.objects.create(user=self.user_client)
         
+        
 
     def test_request_success(self):
         """Verify request succed."""
-        url = '/albums/{}/addSong/'.format(self.album.id)
+        url = '/albums/{}/addSong/'.format(self.album.title)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.artist_token}')
 
         request = self.client.post(url, data={'song_name': self.song.title})
@@ -70,7 +71,7 @@ class POSTRequestsAPITestCase(APITestCase):
 
     def test_like_to_song(self):
         """Verify that toggle like to song works."""
-        url = '/songs/{}/toggleLike/'.format(self.song.id)
+        url = '/songs/{}/toggleLike/'.format(self.song.title)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.user_token}')
         request = self.client.post(url)
         self.assertEqual(request.status_code, status.HTTP_200_OK)
@@ -78,7 +79,7 @@ class POSTRequestsAPITestCase(APITestCase):
 
     def test_like_album(self):
         """Verify that toggle like to album works."""
-        url = '/albums/{}/toggleLike/'.format(self.song.id)
+        url = '/albums/{}/toggleLike/'.format(self.album.title)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.user_token}')
         request = self.client.post(url)
         self.assertEqual(request.status_code, status.HTTP_200_OK)
@@ -86,13 +87,13 @@ class POSTRequestsAPITestCase(APITestCase):
 
     def test_fail_like(self):
         """Test toggle like without authorization."""
-        url = '/albums/{}/toggleLike/'.format(self.song.id)
+        url = '/albums/{}/toggleLike/'.format(self.album.title)
         request = self.client.post(url)
         self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_follow_artist(self):
         """Test follow artist endpoint."""
-        url = '/artists/{}/follow/'.format(self.artist.id)
+        url = '/artists/{}/follow/'.format(self.artist.name)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.user_token}')
         request = self.client.post(url)
         self.assertEqual(request.status_code, status.HTTP_200_OK)
@@ -100,6 +101,6 @@ class POSTRequestsAPITestCase(APITestCase):
 
     def test_fail_follow(self):
         """Verify is authenticated permission."""
-        url = '/artists/{}/follow/'.format(self.artist.id)
+        url = '/artists/{}/follow/'.format(self.artist.name)
         request = self.client.post(url)
         self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)

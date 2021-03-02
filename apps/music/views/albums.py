@@ -13,6 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from apps.music.permissions import IsAlbumOwner, IsArtist
+from apps.music.filters import FilterAlbumsByLike
 
 # Serializers
 from apps.music.serializers import (
@@ -32,16 +33,18 @@ class AlbumViewSet(mixins.ListModelMixin,
     """Album view set."""
 
     serializer_class = AlbumModelSerializer
+    lookup_field = 'title'
+    lookup_url_kwarg = 'title'
 
     # Filter
-    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
-    search_fields = ('title', 'release_date')
+    filter_backends = (SearchFilter, OrderingFilter, FilterAlbumsByLike)
+    search_fields = ('title', 'release_date', 'liked')
     ordering_fields = ('title', 'release_date', 'likes')
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that album exists if id in the url"""
-        if 'pk' in self.kwargs:
-            self.album = get_object_or_404(Album, pk=self.kwargs['pk'])
+        if 'title' in self.kwargs:
+            self.album = get_object_or_404(Album, title=self.kwargs['title'])
             return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)
         else:
             return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)
@@ -61,7 +64,7 @@ class AlbumViewSet(mixins.ListModelMixin,
 
     def get_object(self):
         """Return specific album."""
-        return get_object_or_404(Album, pk=self.kwargs['pk'])
+        return get_object_or_404(Album, title=self.kwargs['title'])
 
     def get_queryset(self):
         """Assing querys based on actions."""
@@ -69,7 +72,7 @@ class AlbumViewSet(mixins.ListModelMixin,
         query = Album.objects.all()
 
         if self.action in ['retrieve', 'addSong']:
-            return query.get(pk=self.kwargs['pk'])
+            return query.get(title=self.kwargs['title'])
 
         return query
 
@@ -89,7 +92,7 @@ class AlbumViewSet(mixins.ListModelMixin,
         return Response(data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['POST'])
-    def addSong(self, request, pk):
+    def addSong(self, request, title):
         """Handle adding songs to the album instance."""
         album_context = self.album
         serializer = AddSongSerializer(
@@ -103,7 +106,7 @@ class AlbumViewSet(mixins.ListModelMixin,
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'])
-    def toggleLike(self, request, pk):
+    def toggleLike(self, request, title):
         """toggle like endpoint handle likes to the album."""
         album = self.album
         user = request.user

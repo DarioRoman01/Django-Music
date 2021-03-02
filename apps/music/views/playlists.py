@@ -31,6 +31,8 @@ class PlaylistViewSet(mixins.ListModelMixin,
     """Playlist view set."""
 
     serializer_class = PlaylistModelSerializer
+    lookup_field = 'title'
+    lookup_url_kwarg = 'title'
 
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, FilterPlaylistByFollow)
@@ -39,8 +41,8 @@ class PlaylistViewSet(mixins.ListModelMixin,
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that playlist exists if id in the url"""
-        if 'pk' in self.kwargs:
-            self.playlist = get_object_or_404(Playlist, pk=self.kwargs['pk'])
+        if 'title' in self.kwargs:
+            self.playlist = get_object_or_404(Playlist, title=self.kwargs['title'])
             return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
         else:
             return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
@@ -56,13 +58,16 @@ class PlaylistViewSet(mixins.ListModelMixin,
 
     def get_object(self):
         """Get specific playlist."""
-        return get_object_or_404(Playlist, pk=self.kwargs['pk'])
+        return get_object_or_404(Playlist, title=self.kwargs['title'])
 
     def get_queryset(self):
         """Assing querys based on actions."""
         query = Playlist.objects.all()
+
         if self.action in ['retrieve', 'addSong']:
-            return query.get(pk=self.kwargs['pk'])
+            return query.get(title=self.kwargs['title'])
+
+        return query
 
     
     @action(detail=False, methods=['POST'])
@@ -80,7 +85,7 @@ class PlaylistViewSet(mixins.ListModelMixin,
         return Response(data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['POST'])
-    def addSong(self, request, pk):
+    def addSong(self, request, title):
         """handle adding song to a playlist."""
         serializer = AddToPlaylistSerializer(
             context={'playlist': self.get_object()},
@@ -94,7 +99,7 @@ class PlaylistViewSet(mixins.ListModelMixin,
 
 
     @action(detail=True, methods=['POST'])
-    def follow(self, request, pk):
+    def follow(self, request, title):
         """Follow endpoint, handle how users follows the playlist."""
         playlist = self.playlist
         user = request.user

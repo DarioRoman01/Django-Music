@@ -31,6 +31,8 @@ class SongViewSet(mixins.ListModelMixin,
     """Songs View set."""
     
     serializer_class = SongModelSeriaizer
+    lookup_field = 'title'
+    lookup_url_kwarg = 'title'
 
     # Filter
     filter_backends = (SearchFilter, OrderingFilter, FilterSongsByLike)
@@ -39,8 +41,8 @@ class SongViewSet(mixins.ListModelMixin,
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that album exists if id in the url"""
-        if 'pk' in self.kwargs:
-            self.song = get_object_or_404(Song, pk=self.kwargs['pk'])
+        if 'title' in self.kwargs:
+            self.song = get_object_or_404(Song, title=self.kwargs['title'])
             return super(SongViewSet, self).dispatch(request, *args, **kwargs)
         else:
             return super(SongViewSet, self).dispatch(request, *args, **kwargs)
@@ -55,13 +57,13 @@ class SongViewSet(mixins.ListModelMixin,
         return [p() for p in permissions]
 
     def get_object(self):
-        return get_object_or_404(Song, pk=self.kwargs['pk'])
+        return get_object_or_404(Song, title=self.kwargs['title'])
 
     def get_queryset(self):
         """Assing querys based on actions."""
         query = Song.objects.all()
         if self.action == 'retrieve':
-            return query.get(pk=self.kwargs['pk'])
+            return query.get(title=self.kwargs['title'])
 
         return query
 
@@ -82,7 +84,7 @@ class SongViewSet(mixins.ListModelMixin,
         return Response(data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['POST'])
-    def toggleLike(self, request, pk):
+    def toggleLike(self, request, title):
         """toggle like endpoint handle likes to the album."""
         song = self.song
         user = request.user

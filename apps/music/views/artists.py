@@ -38,16 +38,18 @@ class ArtistViewSet(mixins.ListModelMixin,
     """Artist view set."""
 
     serializer_class = ArtistModelSerializer
-
+    lookup_field = 'name'
+    lookup_url_kwarg = 'name'
+    
     # Filters
     filter_backends = (SearchFilter, OrderingFilter, FilterArtistByFollow)
-    search_fields = ('artist_name', 'followed')
-    ordering_fields = ('artist_name', 'followers')
+    search_fields = ('name', 'followed')
+    ordering_fields = ('name', 'followers')
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that artist exists if id in the url"""
-        if 'pk' in self.kwargs:
-            self.artist = get_object_or_404(Artist, pk=self.kwargs['pk'])
+        if 'name' in self.kwargs:
+            self.artist = get_object_or_404(Artist, name=self.kwargs['name'])
             return super(ArtistViewSet, self).dispatch(request, *args, **kwargs)
         else:
             return super(ArtistViewSet, self).dispatch(request, *args, **kwargs)
@@ -63,14 +65,14 @@ class ArtistViewSet(mixins.ListModelMixin,
 
     def get_object(self):
         """return aritst instance."""
-        return get_object_or_404(Artist, pk=self.kwargs['pk'])
+        return get_object_or_404(Artist, name=self.kwargs['name'])
 
     def get_queryset(self):
         """Assing querys based on actions."""
         query = Artist.objects.all()
 
         if self.action == ['update', 'partial_update', 'retrieve', 'follow']:
-            return query.get(pk=self.kwargs['pk'])
+            return query.get(name=self.kwargs['name'])
 
         return query
 
@@ -98,7 +100,7 @@ class ArtistViewSet(mixins.ListModelMixin,
         return Response(data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['POST'])
-    def follow(self, request, pk):
+    def follow(self, request, name):
         """Follow endpoint, handle how users follows an artist."""
         artist = self.artist
         user = request.user
