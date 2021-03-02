@@ -15,4 +15,4 @@ class Artist(DjangoMusic):
     followers = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.artist_name
+        return self.name
