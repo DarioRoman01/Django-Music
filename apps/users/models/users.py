@@ -7,6 +7,7 @@ from django.core.validators import RegexValidator
 
 # Models
 from apps.utils import DjangoMusic
+from apps.music import models as MyModels
 
 
 class User(DjangoMusic, AbstractUser):
@@ -56,6 +57,34 @@ class User(DjangoMusic, AbstractUser):
         'verified',
         default=True,
         help_text='Set to true when the user have verified its email address.'
+    )
+
+    followed_artists = models.ManyToManyField(
+        MyModels.Artist, 
+        related_name='followed_aritst',
+        symmetrical=False,
+        help_text='help to perform querys based on artist that user follows'
+    )
+
+    followed_playlist = models.ManyToManyField(
+        MyModels.Playlist,
+        related_name='followed_playlist',
+        symmetrical=False,
+        help_text='help to perform querys based on playlist that user follows'
+    )
+
+    liked_songs = models.ManyToManyField(
+        MyModels.Song,
+        related_name='liked_songs',
+        symmetrical=False,
+        help_text='help to perform querys based on songs the user liked'
+    )
+
+    liked_albums = models.ManyToManyField(
+        MyModels.Album,
+        related_name='liked_albums',
+        symmetrical=False,
+        help_text='help to perform querys based on albums the user liked'
     )
 
 

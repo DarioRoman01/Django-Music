@@ -8,6 +8,7 @@ from rest_framework import status, viewsets, mixins
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Permissions
 from rest_framework.permissions import IsAuthenticated
@@ -33,7 +34,7 @@ class AlbumViewSet(mixins.ListModelMixin,
     serializer_class = AlbumModelSerializer
 
     # Filter
-    filter_backends = (SearchFilter, OrderingFilter)
+    filter_backends = (SearchFilter, OrderingFilter, DjangoFilterBackend)
     search_fields = ('title', 'release_date')
     ordering_fields = ('title', 'release_date', 'likes')
 
@@ -105,16 +106,17 @@ class AlbumViewSet(mixins.ListModelMixin,
     def toggleLike(self, request, pk):
         """toggle like endpoint handle likes to the album."""
         album = self.album
+        user = request.user
 
         # Check if the user already like the album to perform unlike action
-        if album.like.filter(id=request.user.id).exists():
-            album.like.remove(request.user)
+        if user.liked_albums.filter(id=album.id).exists():
+            user.liked_albums.remove(album)
             album.likes -= 1
             album.save()
         
         # else perform like action
         else:
-            album.like.add(request.user)
+            user.liked_albums.add(album)
             album.likes += 1
             album.save()
 

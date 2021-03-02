@@ -12,6 +12,8 @@ from apps.music.permissions import IsPlaylistOwner
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from apps.music.filters import FilterPlaylistByFollow
 
 # Serializers
 from apps.music.serializers import (
@@ -31,8 +33,8 @@ class PlaylistViewSet(mixins.ListModelMixin,
     serializer_class = PlaylistModelSerializer
 
     # Filters
-    filter_backends = (SearchFilter, OrderingFilter)
-    search_fields = ('title', 'followers')
+    filter_backends = (SearchFilter, OrderingFilter, FilterPlaylistByFollow)
+    search_fields = ('title', 'followers', 'followed')
     ordering_fields = ('title', 'followers')
 
     def dispatch(self, request, *args, **kwargs):
@@ -95,16 +97,17 @@ class PlaylistViewSet(mixins.ListModelMixin,
     def follow(self, request, pk):
         """Follow endpoint, handle how users follows the playlist."""
         playlist = self.playlist
+        user = request.user
 
         # Check if requesting user already follow the playlist
-        if playlist.follow.filter(id=request.user.id).exists():
-            playlist.follow.remove(request.user)
+        if user.followed_playlist.filter(id=playlist.id).exists():
+            user.followed_playlist.remove(playlist)
             playlist.followers -= 1
             playlist.save()
         
         # if user dont follow the playlist is added to the playlist followers.
         else:
-            playlist.follow.add(request.user)
+            user.followed_playlist.add(playlist)
             playlist.followers += 1
             playlist.save()
 

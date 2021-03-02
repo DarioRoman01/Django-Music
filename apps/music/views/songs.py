@@ -12,6 +12,8 @@ from apps.music.permissions import IsSongOwner, IsArtist
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from apps.music.filters import FilterSongsByLike
 
 # Serializers
 from apps.music.serializers import (
@@ -31,8 +33,8 @@ class SongViewSet(mixins.ListModelMixin,
     serializer_class = SongModelSeriaizer
 
     # Filter
-    filter_backends = (SearchFilter, OrderingFilter)
-    search_fields = ('title', 'artist', 'release_date')
+    filter_backends = (SearchFilter, OrderingFilter, FilterSongsByLike)
+    search_fields = ('title', 'artist', 'release_date', 'liked')
     ordering_fields = ('title', 'artist', 'release_date', 'likes')
 
     def dispatch(self, request, *args, **kwargs):
@@ -83,16 +85,17 @@ class SongViewSet(mixins.ListModelMixin,
     def toggleLike(self, request, pk):
         """toggle like endpoint handle likes to the album."""
         song = self.song
+        user = request.user
 
         # Check if the user already liked the song to perform unlike action
-        if song.like.filter(id=request.user.id).exists():
-            song.like.remove(request.user)
+        if user.liked_songs.filter(id=song.id).exists():
+            user.liked_songs.remove(song)
             song.likes -= 1
             song.save()
             
         # Else perform like action
         else:
-            song.like.add(request.user)
+            user.liked_songs.add(song)
             song.likes += 1
             song.save()
 

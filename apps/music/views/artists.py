@@ -12,6 +12,8 @@ from apps.music.permissions import IsArtistOwner
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
+from apps.music.filters import FilterArtistByFollow
+from django_filters.rest_framework import DjangoFilterBackend
 
 # Serializers
 from apps.music.serializers import (
@@ -38,8 +40,8 @@ class ArtistViewSet(mixins.ListModelMixin,
     serializer_class = ArtistModelSerializer
 
     # Filters
-    filter_backends = (SearchFilter, OrderingFilter)
-    search_fields = ('artist_name',)
+    filter_backends = (SearchFilter, OrderingFilter, FilterArtistByFollow)
+    search_fields = ('artist_name', 'followed')
     ordering_fields = ('artist_name', 'followers')
 
     def dispatch(self, request, *args, **kwargs):
@@ -99,14 +101,15 @@ class ArtistViewSet(mixins.ListModelMixin,
     def follow(self, request, pk):
         """Follow endpoint, handle how users follows an artist."""
         artist = self.artist
+        user = request.user
 
-        if artist.follow.filter(id=request.user.id).exists():
-            artist.follow.remove(request.user)
+        if user.followed_artists.filter(id=artist.id).exists():
+            user.followed_artist.remove(artist)
             artist.followers -= 1
             artist.save()
 
         else:
-            artist.follow.add(request.user)
+            user.followed_artists.add(artist)
             artist.followers += 1
             artist.save()
 
