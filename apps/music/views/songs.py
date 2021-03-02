@@ -10,6 +10,9 @@ from rest_framework import status, viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from apps.music.permissions import IsSongOwner, IsArtist
 
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 # Serializers
 from apps.music.serializers import (
     CreateSongSerializer,
@@ -20,17 +23,25 @@ from apps.music.serializers import (
 # Models
 from apps.music.models import Song
 
-class SongViewSet(mixins.RetrieveModelMixin,
+class SongViewSet(mixins.ListModelMixin,
+                  mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     """Songs View set."""
     
     serializer_class = SongModelSeriaizer
 
+    # Filter
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('title', 'artist', 'release_date')
+    ordering_fields = ('title', 'artist', 'release_date', 'likes')
+
     def dispatch(self, request, *args, **kwargs):
-        """Verify that album exists."""
-        pk = self.kwargs['pk']
-        self.song = get_object_or_404(Song, pk=pk)
-        return super(SongViewSet, self).dispatch(request, *args, **kwargs)
+        """Verify that album exists if id in the url"""
+        if 'pk' in self.kwargs:
+            self.song = get_object_or_404(Song, pk=self.kwargs['pk'])
+            return super(SongViewSet, self).dispatch(request, *args, **kwargs)
+        else:
+            return super(SongViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_permissions(self):
         """Assing permissions based on actions."""

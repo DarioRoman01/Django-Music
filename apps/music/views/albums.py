@@ -6,6 +6,9 @@ from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework import status, viewsets, mixins
 
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from apps.music.permissions import IsAlbumOwner, IsArtist
@@ -22,17 +25,22 @@ from apps.music.serializers import (
 # Models
 from apps.music.models import Album, Artist
 
-class AlbumViewSet(mixins.RetrieveModelMixin,
+class AlbumViewSet(mixins.ListModelMixin,
+                   mixins.RetrieveModelMixin,
                    viewsets.GenericViewSet):
     """Album view set."""
 
     serializer_class = AlbumModelSerializer
 
+    # Filter
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('title', 'release_date')
+    ordering_fields = ('title', 'release_date', 'likes')
+
     def dispatch(self, request, *args, **kwargs):
-        """Verify that album exists."""
+        """Verify that album exists if id in the url"""
         if 'pk' in self.kwargs:
-            pk = self.kwargs['pk']
-            self.album = get_object_or_404(Album, pk=pk)
+            self.album = get_object_or_404(Album, pk=self.kwargs['pk'])
             return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)
         else:
             return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)

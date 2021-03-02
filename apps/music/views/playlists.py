@@ -10,6 +10,9 @@ from rest_framework import status, viewsets, mixins
 from rest_framework.permissions import IsAuthenticated
 from apps.music.permissions import IsPlaylistOwner
 
+# Filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 # Serializers
 from apps.music.serializers import (
     CreatePlaylistSerializer,
@@ -20,16 +23,25 @@ from apps.music.serializers import (
 # Models
 from apps.music.models import Playlist
 
-class PlaylistViewSet(mixins.RetrieveModelMixin,
+class PlaylistViewSet(mixins.ListModelMixin,
+                      mixins.RetrieveModelMixin,
                       viewsets.GenericViewSet):
     """Playlist view set."""
 
     serializer_class = PlaylistModelSerializer
 
+    # Filters
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('title', 'followers')
+    ordering_fields = ('title', 'followers')
+
     def dispatch(self, request, *args, **kwargs):
-        """Verify that playlist exists."""
-        self.playlist = get_object_or_404(Playlist, pk=self.kwargs['pk'])
-        return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
+        """Verify that playlist exists if id in the url"""
+        if 'pk' in self.kwargs:
+            self.playlist = get_object_or_404(Playlist, pk=self.kwargs['pk'])
+            return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
+        else:
+            return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_permissions(self):
         """Assing permissions based on actions."""
