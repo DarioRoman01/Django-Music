@@ -42,10 +42,26 @@ class GETRequestsAPITestCase(APITestCase):
         self.song.save()
 
         self.token = Token.objects.create(user=self.user).key
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
 
     def test_get_artist_endpoint(self):
         url = '/artists/{}/'.format(self.artist.id)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
         request = self.client.get(url)
-        import pdb; pdb.set_trace()
         self.assertEqual(request.status_code, status.HTTP_200_OK)
+
+    def test_get_album_endpoint(self):
+        url = '/albums/{}/'.format(self.album.id)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
+        request = self.client.get(url)
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+
+    def test_get_song_endpoint(self):
+        url = '/songs/{}/'.format(self.song.id)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token}')
+        request = self.client.get(url)
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+
+    def test_get_without_authorization(self):
+        url = '/songs/{}/'.format(self.song.id)
+        request = self.client.get(url)
+        self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)

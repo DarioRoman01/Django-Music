@@ -30,18 +30,23 @@ class AlbumViewSet(mixins.RetrieveModelMixin,
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that album exists."""
-        pk = self.kwargs['pk']
-        self.album = get_object_or_404(Album, pk=pk)
-        return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)
+        if 'pk' in self.kwargs:
+            pk = self.kwargs['pk']
+            self.album = get_object_or_404(Album, pk=pk)
+            return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)
+        else:
+            return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)
 
     def get_permissions(self):
         """Assing permissions based on actions."""
-        if self.action == 'retrieve':
-            permissions = [IsAuthenticated]
-        elif self.action == 'createAlbum':
-            permissions = [IsAuthenticated, IsArtist]
+        permissions = [IsAuthenticated]
+
+        if self.action == 'createAlbum':
+            permissions.append(IsArtist)
+
         elif self.action == 'addSong':
-            permissions = [IsAuthenticated, IsAlbumOwner, IsArtist]
+            permissions.append(IsAlbumOwner)
+            permissions.append(IsArtist)
 
         return [p() for p in permissions]
 
