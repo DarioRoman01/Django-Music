@@ -12,7 +12,7 @@ from apps.music.permissions import IsArtistOwner
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
-from apps.music.filters import FilterArtistByFollow
+from apps.music.filters import FilterByFollow
 from django_filters.rest_framework import DjangoFilterBackend
 
 # Serializers
@@ -42,12 +42,15 @@ class ArtistViewSet(mixins.ListModelMixin,
     lookup_url_kwarg = 'name'
     
     # Filters
-    filter_backends = (SearchFilter, OrderingFilter, FilterArtistByFollow)
+    filter_backends = (SearchFilter, OrderingFilter, FilterByFollow)
     search_fields = ('name', 'followed')
     ordering_fields = ('name', 'followers')
 
     def dispatch(self, request, *args, **kwargs):
-        """Verify that artist exists if id in the url"""
+        """Verify that artist exists if iname in the url
+         and set view name to do betters filter backends"""
+        self.name = 'ArtistViewSet'
+
         if 'name' in self.kwargs:
             self.artist = get_object_or_404(Artist, name=self.kwargs['name'])
             return super(ArtistViewSet, self).dispatch(request, *args, **kwargs)

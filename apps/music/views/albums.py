@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 # Permissions
 from rest_framework.permissions import IsAuthenticated
 from apps.music.permissions import IsAlbumOwner, IsArtist
-from apps.music.filters import FilterAlbumsByLike
+from apps.music.filters import FilterByLike
 
 # Serializers
 from apps.music.serializers import (
@@ -37,12 +37,14 @@ class AlbumViewSet(mixins.ListModelMixin,
     lookup_url_kwarg = 'title'
 
     # Filter
-    filter_backends = (SearchFilter, OrderingFilter, FilterAlbumsByLike)
+    filter_backends = (SearchFilter, OrderingFilter, FilterByLike)
     search_fields = ('title', 'release_date', 'liked')
     ordering_fields = ('title', 'release_date', 'likes')
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that album exists if id in the url"""
+        self.name = 'AlbumViewSet'
+
         if 'title' in self.kwargs:
             self.album = get_object_or_404(Album, title=self.kwargs['title'])
             return super(AlbumViewSet, self).dispatch(request, *args, **kwargs)

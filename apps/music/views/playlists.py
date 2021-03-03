@@ -13,7 +13,7 @@ from apps.music.permissions import IsPlaylistOwner
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from apps.music.filters import FilterPlaylistByFollow
+from apps.music.filters import FilterByFollow
 
 # Serializers
 from apps.music.serializers import (
@@ -35,15 +35,18 @@ class PlaylistViewSet(mixins.ListModelMixin,
     lookup_url_kwarg = 'title'
 
     # Filters
-    filter_backends = (SearchFilter, OrderingFilter, FilterPlaylistByFollow)
+    filter_backends = (SearchFilter, OrderingFilter, FilterByFollow)
     search_fields = ('title', 'followers', 'followed')
     ordering_fields = ('title', 'followers')
 
     def dispatch(self, request, *args, **kwargs):
-        """Verify that playlist exists if id in the url"""
+        """Verify that playlist exists if title in the url and set view name"""
+        self.name = 'PlaylistViewSet'
+
         if 'title' in self.kwargs:
             self.playlist = get_object_or_404(Playlist, title=self.kwargs['title'])
             return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
+
         else:
             return super(PlaylistViewSet, self).dispatch(request, *args, **kwargs)
 

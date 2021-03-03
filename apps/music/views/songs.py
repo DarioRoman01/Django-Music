@@ -12,8 +12,7 @@ from apps.music.permissions import IsSongOwner, IsArtist
 
 # Filters
 from rest_framework.filters import SearchFilter, OrderingFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from apps.music.filters import FilterSongsByLike
+from apps.music.filters import FilterByLike
 
 # Serializers
 from apps.music.serializers import (
@@ -35,12 +34,15 @@ class SongViewSet(mixins.ListModelMixin,
     lookup_url_kwarg = 'title'
 
     # Filter
-    filter_backends = (SearchFilter, OrderingFilter, FilterSongsByLike)
+    filter_backends = (SearchFilter, OrderingFilter, FilterByLike)
     search_fields = ('title', 'artist', 'release_date', 'liked')
     ordering_fields = ('title', 'artist', 'release_date', 'likes')
 
     def dispatch(self, request, *args, **kwargs):
-        """Verify that album exists if id in the url"""
+        """Verify that album exists if title in the url and set
+         names to help to distinguish the view in custom filters"""
+
+        self.name = 'SongViewSet'
         if 'title' in self.kwargs:
             self.song = get_object_or_404(Song, title=self.kwargs['title'])
             return super(SongViewSet, self).dispatch(request, *args, **kwargs)
@@ -103,4 +105,4 @@ class SongViewSet(mixins.ListModelMixin,
 
         data = SongModelSeriaizer(song).data
 
-        return Response(data, status=status.HTTP_200_OK) 
+        return Response(data, status=status.HTTP_200_OK)
