@@ -73,10 +73,34 @@ class AlbumAPITestCase(APITestCase):
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(request.data['count'], 5)
 
+    
+    def test_fail_requests(self):
 
+        # Test get albums without token
+        url = '/albums/'
+        self.client.credentials()
+        request = self.client.get(url)
+        self.assertEqual(request.status_code, status.HTTP_401_UNAUTHORIZED)
 
+        # Test create album with normal user status
+        url = '/albums/createAlbum/'
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.user_token}')
+        request = self.client.post(
+            url,
+            data = {"title": 'OWO', 'release_date': '2007-10-25 14:30:59'}
+        )
+        self.assertEqual(request.status_code, status.HTTP_403_FORBIDDEN)
 
+        # test not found error
+        url = 'albums/addAlbum/'
+        request = self.client.get(url)
+        self.assertEqual(request.status_code, status.HTTP_404_NOT_FOUND)
 
-        
-
-
+        # Test bad request
+        url = '/albums/createAlbum/'
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.artist_token}')
+        request = self.client.post(
+            url,
+            data = {"title": 'SONG'}
+        )
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)

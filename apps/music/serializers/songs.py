@@ -32,7 +32,7 @@ class CreateSongSerializer(serializers.Serializer):
 
     title = serializers.CharField(max_length=50)
     cover_image = serializers.ImageField(required=False)
-    song_file = serializers.FileField(required=True)
+    song_file = serializers.FileField(required=False)
     release_date = serializers.DateTimeField()
 
     def create(self, data):
