@@ -97,7 +97,7 @@ class ArtistViewSet(mixins.ListModelMixin,
         artist = serializer.save()
         data = {
             'artist': ArtistModelSerializer(artist).data,
-            'message': 'Congratulations now you are an artist, now go and share your talent'
+            'message': 'Congratulations you are an artist, now go and share your talent'
         }
 
         return Response(data, status=status.HTTP_200_OK)

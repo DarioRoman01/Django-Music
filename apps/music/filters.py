@@ -3,9 +3,10 @@
 # Rest framework
 from rest_framework.filters import SearchFilter
 
+
 class FilterByFollow(SearchFilter):
     """Filter the query to return only the followed playlist or artist."""
-    
+
     def get_search_fields(self, view, request):
         """ Check if followed is in query params."""
         if request.query_params.get('followed'):
