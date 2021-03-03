@@ -81,9 +81,8 @@ class AlbumViewSet(mixins.ListModelMixin,
     @action(detail=False, methods=['POST'])
     def createAlbum(self, request):
         """Handle album creation."""
-        artist = Artist.objects.get(user=request.user)
         serializer = CreateAlbumSerializer(
-            context={'artist': artist},
+            context={'artist': request.user.artist},
             data=request.data
         )
         serializer.is_valid(raise_exception=True)

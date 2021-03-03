@@ -36,7 +36,7 @@ class CreateAlbumSerializer(serializers.Serializer):
     """Create Album serializer."""
 
     title = serializers.CharField(max_length=50)
-    cover_image = serializers.ImageField(required=True)
+    cover_image = serializers.ImageField(required=False)
     release_date = serializers.DateTimeField()
 
     def create(self, data):

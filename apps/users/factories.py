@@ -14,6 +14,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
     email = factory.LazyAttribute(lambda a: '{}@example.com'.format(a.first_name).lower())
-
+    is_artist = False
+    
     class Meta:
         model = 'users.User'
