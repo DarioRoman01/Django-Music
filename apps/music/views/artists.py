@@ -42,9 +42,9 @@ class ArtistViewSet(mixins.ListModelMixin,
     lookup_url_kwarg = 'name'
     
     # Filters
-    filter_backends = (SearchFilter, OrderingFilter, FilterByFollow)
-    search_fields = ('name', 'followed')
-    ordering_fields = ('name', 'followers')
+    filter_backends = [SearchFilter, OrderingFilter, FilterByFollow]
+    search_fields = ['name', 'followed']
+    ordering_fields = ['name', 'followers']
 
     def dispatch(self, request, *args, **kwargs):
         """Verify that artist exists if iname in the url
