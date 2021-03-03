@@ -2,7 +2,7 @@
 
 ## What is this? Why?
 
-This can be called a 'personal' project by [@Haizza1](https://github.com/Haizza1) with the original intentions of learning DjangoRestFramework, and at the same time, do something that could be shared and used to share knowledge on programming and software design. If you'd like to learn about how this project is design, please check my [high level design document](https://github.com/Haizza1/Django-Music/blob/master/design/Design-doc.md) first.
+This can be called a 'personal' project by [@Haizza1](https://github.com/Haizza1) with the original intentions of learning DjangoRestFramework, and at the same time, do something that could be shared and used to share knowledge on programming and software design. If you'd like to learn about how this project is design, please check my [high level design document](https://github.com/Haizza1/Django-Music/wiki/High-level-design) first.
 
 
 ## Project status
@@ -14,7 +14,7 @@ Intention is to follow best python practices.
 Visit pep8 website to see more about.
 https://www.python.org/dev/peps/pep-0008/
 
-Use CodeFormatter: https://pypi.org/project/autopep8/
+Use CodeFormatter: [flake8](https://flake8.pycqa.org/en/latest/index.html)
 as a tool to format code.
 
 **Note: code formatting and perfect style is out of scope for the moment**
